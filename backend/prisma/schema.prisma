@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  INTERNSHIP
+  CONTRACT
+}
+
+enum LocationType {
+  REMOTE
+  ONSITE
+  HYBRID
+}
+
+enum JobStatus {
+  DRAFT
+  PENDING
+  LIVE
+  CLOSED
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Job {
+  id                String        @id @default(uuid()) @db.Uuid
+  title             String
+  description       String
+  payStartRange     Int
+  payEndRange       Int
+  location          String
+  jobType           JobType
+  locationType      LocationType
+  status            JobStatus     @default(DRAFT)
+  slug              String        @unique
+  applicationFields Json
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  applications      Application[]
+
+  @@index([status])
+  @@map("jobs")
+}
+
+model Application {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  email       String
+  phone       String?
+  resume      String
+  coverLetter String?
+  jobId       String   @db.Uuid
+  job         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@index([jobId])
+  @@index([email])
+  @@map("applications")
+}
