@@ -111,7 +111,7 @@ Next.js 16 with React 19, Formik for forms, Zustand for auth state, LESS modules
 
 | Variable | Default | Notes |
 |----------|---------|-------|
-| `NEXT_PUBLIC_API_URL` | `http://localhost:5000` | Where the backend lives |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:3000` | Where the backend lives |
 
 ---
 
