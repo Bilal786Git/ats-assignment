@@ -1,15 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { Formik, Form, Field } from "formik";
 import { Button } from "@ats/components/ui/Button/Button";
 import { Input } from "@ats/components/ui/Input/Input";
 import { TextArea } from "@ats/components/ui/TextArea/TextArea";
 import { FileUploadField } from "@ats/components/forms/FileUploadField/FileUploadField";
-import { DynamicFormRenderer } from "@ats/components/forms/DynamicFormRenderer/DynamicFormRenderer";
 import { useApi } from "@ats/hooks/useApi";
-import { toast } from "@ats/components/ui/Toast/Toast";
 import type { Job } from "@ats/types";
 import styles from "./JobApplyForm.module.less";
+import { jobApplySchema } from "@ats/yup/jobApplySchema";
 
 interface JobApplyFormProps {
   job: Job;
@@ -17,118 +16,102 @@ interface JobApplyFormProps {
   onCancel: () => void;
 }
 
+interface FormValues {
+  name: string;
+  email: string;
+  coverLetter: string;
+  resume: string;
+  jobId: string;
+}
+
 export function JobApplyForm({ job, onSuccess, onCancel }: JobApplyFormProps) {
   const { request, loading } = useApi();
-  const config = job.formConfig;
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [coverLetter, setCoverLetter] = useState("");
-  const [resume, setResume] = useState<File | null>(null);
-  const [customValues, setCustomValues] = useState<Record<string, string>>({});
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const validate = (): boolean => {
-    const errs: Record<string, string> = {};
-    if (!name.trim()) errs.name = "Name is required";
-    if (!email.trim()) errs.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      errs.email = "Invalid email";
-    if (config?.coverLetterEnabled && !coverLetter.trim())
-      errs.coverLetter = "Cover letter is required";
-    if (config?.resumeRequired && !resume) errs.resume = "Resume is required";
-    config?.customFields.forEach((f) => {
-      if (f.required && !customValues[f.id]?.trim())
-        errs[f.id] = `${f.label} is required`;
-    });
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
+  const initialValues: FormValues = {
+    name: "",
+    email: "",
+    coverLetter: "",
+    resume: "",
+    jobId: job.id,
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-
+  const handleSubmit = async (values: FormValues) => {
     try {
-      const formData = new FormData();
-      formData.append("jobId", job.id);
-      formData.append("name", name);
-      formData.append("email", email);
-      if (coverLetter) formData.append("coverLetter", coverLetter);
-      if (resume) formData.append("resume", resume);
-      formData.append("customResponses", JSON.stringify(customValues));
-
-      await request("POST", "/applications/create", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      toast("success", "Application submitted successfully!");
+      await request("POST", "/applications/create", values);
+      alert("Application submitted successfully!");
       onSuccess();
     } catch {
-      toast("error", "Failed to submit application");
+      alert("Failed to submit application");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <h3 style={{ fontSize: 16, fontWeight: 600, color: "#111827" }}>
-        Apply Now
-      </h3>
+    <Formik
+      initialValues={initialValues}
+      validationSchema={jobApplySchema({
+        coverRequired: job.coverRequired,
+        resumeRequired: job.resumeRequired,
+      })}
+      onSubmit={handleSubmit}
+    >
+      {({ errors, touched, setFieldValue }) => {
+        return (
+          <Form className={styles.form}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: "#111827" }}>
+              Apply Now
+            </h3>
 
-      <div className={styles.grid}>
-        <Input
-          label="Full Name"
-          placeholder="John Doe"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          error={errors.name}
-        />
-        <Input
-          label="Email"
-          type="email"
-          placeholder="john@company.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          error={errors.email}
-        />
-      </div>
+            <div className={styles.grid}>
+              <Field
+                as={Input}
+                name="name"
+                label="Full Name"
+                placeholder="John Doe"
+                error={touched.name && errors.name ? errors.name : ""}
+              />
+              <Field
+                as={Input}
+                name="email"
+                type="email"
+                label="Email"
+                placeholder="john@company.com"
+                error={touched.email && errors.email ? errors.email : ""}
+              />
+            </div>
 
-      {config?.coverLetterEnabled && (
-        <TextArea
-          label="Cover Letter"
-          placeholder="Tell us why you're a great fit..."
-          value={coverLetter}
-          onChange={(e) => setCoverLetter(e.target.value)}
-          error={errors.coverLetter}
-        />
-      )}
+            {job?.coverRequired && (
+              <Field
+                as={TextArea}
+                name="coverLetter"
+                label="Cover Letter"
+                placeholder="Tell us why you're a great fit..."
+                error={
+                  touched.coverLetter && errors.coverLetter
+                    ? errors.coverLetter
+                    : ""
+                }
+              />
+            )}
 
-      {config?.resumeRequired && (
-        <FileUploadField
-          label="Resume / CV"
-          error={errors.resume}
-          onChange={(f) => setResume(f)}
-        />
-      )}
+            {job?.resumeRequired && (
+              <FileUploadField
+                label="Resume / CV"
+                error={touched.resume && errors.resume ? errors.resume : ""}
+                onChange={(f) => setFieldValue("resume", f)}
+              />
+            )}
 
-      {config?.customFields && (
-        <DynamicFormRenderer
-          fields={config.customFields}
-          values={customValues}
-          errors={errors}
-          onChange={(id, val) =>
-            setCustomValues((prev) => ({ ...prev, [id]: val }))
-          }
-        />
-      )}
-
-      <div className={styles.actions}>
-        <Button type="submit" loading={loading}>
-          Submit Application
-        </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-      </div>
-    </form>
+            <div className={styles.actions}>
+              <Button type="submit" loading={loading}>
+                Submit Application
+              </Button>
+              <Button type="button" variant="outline" onClick={onCancel}>
+                Cancel
+              </Button>
+            </div>
+          </Form>
+        );
+      }}
+    </Formik>
   );
 }

@@ -26,12 +26,6 @@ export interface CustomField {
   required: boolean;
 }
 
-export interface JobFormConfig {
-  coverLetterEnabled: boolean;
-  resumeRequired: boolean;
-  customFields: CustomField[];
-}
-
 export interface Job {
   id: string;
   title: string;
@@ -43,7 +37,8 @@ export interface Job {
   locationType: JobLocationType;
   status: JobStatus;
   slug: string;
-  formConfig?: JobFormConfig;
+  resumeRequired?: boolean;
+  coverRequired?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -57,7 +52,6 @@ export interface CreateJobPayload {
   jobType: JobType;
   locationType: JobLocationType;
   status: JobStatus;
-  formConfig?: JobFormConfig;
 }
 
 export interface ApplicationPayload {

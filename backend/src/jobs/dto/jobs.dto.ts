@@ -13,6 +13,17 @@ export interface CreateJobDto {
   jobType: JobType;
   status: JobStatus;
   locationType: JobLocationType;
+  resumeRequired?: boolean;
+  coverRequired?: boolean;
 }
 
 export type UpdateJobDto = Partial<CreateJobDto>;
+
+export interface FindAllJobsDto {
+  search?: string;
+  type?: string;
+  userId?: string;
+  status?: string;
+  limit?: number;
+  offset?: number;
+}

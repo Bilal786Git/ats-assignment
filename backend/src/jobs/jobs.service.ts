@@ -1,31 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateJobDto, UpdateJobDto } from './dto/jobs.dto';
+import type {
+  CreateJobDto,
+  UpdateJobDto,
+  FindAllJobsDto,
+} from './dto/jobs.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { randomUUID } from 'crypto';
-import type {
-  JobType,
-  LocationType as JobLocationType,
-  JobStatus as JobStatusType,
-} from '../../generated/prisma';
-
-const jobTypesMap: Record<string, JobType> = {
-  'full-time': 'FULL_TIME',
-  'part-time': 'PART_TIME',
-  internship: 'INTERNSHIP',
-};
-
-const locationTypesMap: Record<string, JobLocationType> = {
-  remote: 'REMOTE',
-  'on-site': 'ONSITE',
-  hybrid: 'HYBRID',
-};
-
-const jobStatusMap: Record<string, JobStatusType> = {
-  draft: 'DRAFT',
-  pending: 'PENDING',
-  live: 'LIVE',
-  closed: 'CLOSED',
-};
 
 @Injectable()
 export class JobsService {
@@ -34,13 +14,9 @@ export class JobsService {
   async create(dto: CreateJobDto) {
     try {
       const slug = randomUUID();
-
       return this.prisma.job.create({
         data: {
           ...dto,
-          jobType: jobTypesMap[dto.jobType],
-          locationType: locationTypesMap[dto.locationType],
-          applicationFields: {},
           slug,
         },
       });
@@ -50,16 +26,24 @@ export class JobsService {
     }
   }
 
-  async findAll(userId?: string, status?: string) {
-    const statusFilter = status
-      ? (status.toUpperCase() as 'DRAFT' | 'PENDING' | 'LIVE' | 'CLOSED')
-      : undefined;
+  async findAll({ userId, status, type, search }: FindAllJobsDto) {
+    const statusFilter = status ? status.toUpperCase() : undefined;
     const where: Record<string, unknown> = {};
 
     if (statusFilter) {
       where.status = statusFilter;
     } else if (!userId) {
       where.status = 'LIVE';
+    }
+
+    if (type) {
+      where.jobType = type.toUpperCase();
+    }
+    if (search) {
+      where.title = {
+        contains: search,
+        mode: 'insensitive',
+      };
     }
 
     return this.prisma.job.findMany({
@@ -90,19 +74,13 @@ export class JobsService {
 
   async update(id: string, dto: UpdateJobDto) {
     await this.findOne(id);
+    console.log('dto:', dto);
     return this.prisma.job.update({
       where: { id },
       data: Object.fromEntries(
         Object.entries(dto)
-          .filter(([key, value]) => value !== undefined && key !== 'formConfig')
+          .filter(([, value]) => value !== undefined)
           .map(([key, val]) => {
-            if (typeof val === 'string' && key === 'jobType') {
-              return [key, { set: jobTypesMap[val] }];
-            } else if (typeof val === 'string' && key === 'locationType') {
-              return [key, { set: locationTypesMap[val] }];
-            } else if (typeof val === 'string' && key === 'status') {
-              return [key, { set: jobStatusMap[val] }];
-            }
             return [key, { set: val }];
           }),
       ),

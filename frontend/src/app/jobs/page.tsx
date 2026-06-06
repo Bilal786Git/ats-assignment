@@ -7,6 +7,7 @@ import { Select } from "@ats/components/ui/Select/Select";
 import { CardSkeleton } from "@ats/components/ui/Skeleton/CardSkeleton";
 import { useApi } from "@ats/hooks/useApi";
 import type { Job } from "@ats/types";
+import { JobTypes } from "@ats/constants/jobs-meta";
 
 export default function PublicJobsPage() {
   const { request, loading } = useApi<Job[]>();
@@ -15,12 +16,15 @@ export default function PublicJobsPage() {
   const [typeFilter, setTypeFilter] = useState("");
 
   useEffect(() => {
-    request("GET", "/jobs?status=live")
+    request(
+      "GET",
+      `/jobs?status=live&${search ? `search=${search}` : ""}&${typeFilter ? `type=${typeFilter}` : ""}`,
+    )
       .then(setJobs)
       .catch((error) => {
         console.log("ERROR", error);
       });
-  }, [request]);
+  }, [request, search, typeFilter]);
 
   const filtered = jobs.filter((job) => {
     const q = search.toLowerCase();
@@ -76,14 +80,22 @@ export default function PublicJobsPage() {
         >
           <div style={{ flex: 1, position: "relative", minWidth: 200 }}>
             <svg
-              width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
               style={{
                 position: "absolute",
                 left: 12,
                 top: 12,
                 color: "#9ca3af",
               }}
-            ><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
             <input
               type="text"
               placeholder="Search jobs, location, keywords..."
@@ -105,9 +117,9 @@ export default function PublicJobsPage() {
           <Select
             options={[
               { value: "", label: "All Types" },
-              { value: "full-time", label: "Full-time" },
-              { value: "part-time", label: "Part-time" },
-              { value: "internship", label: "Internship" },
+              { value: JobTypes.full_time, label: "Full-time" },
+              { value: JobTypes.part_time, label: "Part-time" },
+              { value: JobTypes.internship, label: "Internship" },
             ]}
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}

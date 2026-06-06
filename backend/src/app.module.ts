@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { JobsModule } from './jobs/jobs.module';
+import { ApplicationsModule } from './applications/applications.module';
 import { ContextMiddleware } from './common/middleware/context.middleware';
 
 @Module({
@@ -12,6 +13,7 @@ import { ContextMiddleware } from './common/middleware/context.middleware';
     AuthModule,
     PrismaModule,
     JobsModule,
+    ApplicationsModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET ?? '',
       signOptions: { expiresIn: '1d' },

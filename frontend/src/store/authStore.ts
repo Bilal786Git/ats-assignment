@@ -24,10 +24,11 @@ function getInitialState(): {
     const stored = localStorage.getItem("ats_auth");
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (parsed && parsed.token) {
+      const data = parsed.state;
+      if (data && data.token) {
         return {
-          token: parsed.token,
-          user: parsed.user || null,
+          token: data.token,
+          user: data.user || null,
           isAuthenticated: true,
         };
       }

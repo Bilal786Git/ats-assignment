@@ -6,7 +6,6 @@ import { Button } from "@ats/components/ui/Button/Button";
 import { Input } from "@ats/components/ui/Input/Input";
 import { useAuthStore } from "@ats/store/authStore";
 import { useApi } from "@ats/hooks/useApi";
-import { toast } from "@ats/components/ui/Toast/Toast";
 import type { AuthResponse, LoginPayload } from "@ats/types";
 
 export default function LoginPage() {
@@ -51,10 +50,10 @@ export default function LoginPage() {
         password,
       } as LoginPayload);
       setAuth(data.accessToken, data.user);
-      toast("success", "Logged in successfully");
+      console.log("success", "Logged in successfully");
       router.push("/admin/dashboard");
     } catch {
-      toast("error", "Invalid email or password");
+      console.log("error", "Invalid email or password");
     }
   };
 
@@ -84,7 +83,17 @@ export default function LoginPage() {
               color: "white",
             }}
           >
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+              <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" />
+            </svg>
           </div>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111827" }}>
             ATS Admin
@@ -137,9 +146,30 @@ export default function LoginPage() {
               }}
             >
               {showPassword ? (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" />
+                  <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
               ) : (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
               )}
             </button>
           </div>
