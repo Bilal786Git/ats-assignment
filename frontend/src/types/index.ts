@@ -1,0 +1,96 @@
+export type JobStatus = "draft" | "pending" | "live" | "closed";
+export type JobType = "full-time" | "part-time" | "internship";
+export type JobLocationType = "remote" | "on-site" | "hybrid";
+export type CustomFieldType = "text" | "textarea" | "file";
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+}
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  user: User;
+}
+
+export interface CustomField {
+  id: string;
+  label: string;
+  type: CustomFieldType;
+  required: boolean;
+}
+
+export interface JobFormConfig {
+  coverLetterEnabled: boolean;
+  resumeRequired: boolean;
+  customFields: CustomField[];
+}
+
+export interface Job {
+  id: string;
+  title: string;
+  description: string;
+  payStartRange: number;
+  payEndRange: number;
+  location: string;
+  jobType: JobType;
+  locationType: JobLocationType;
+  status: JobStatus;
+  slug: string;
+  formConfig?: JobFormConfig;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateJobPayload {
+  title: string;
+  description: string;
+  payStartRange: number;
+  payEndRange: number;
+  location: string;
+  jobType: JobType;
+  locationType: JobLocationType;
+  status: JobStatus;
+  formConfig?: JobFormConfig;
+}
+
+export interface ApplicationPayload {
+  jobId: string;
+  name: string;
+  email: string;
+  coverLetter?: string;
+  resume?: File;
+  customResponses?: Record<string, string>;
+}
+
+export const JOB_STATUS_FLOW: Record<JobStatus, JobStatus[]> = {
+  draft: ["pending"],
+  pending: ["live"],
+  live: ["closed"],
+  closed: [],
+};
+
+export const JOB_STATUS_LABELS: Record<JobStatus, string> = {
+  draft: "Draft",
+  pending: "Pending",
+  live: "Live",
+  closed: "Closed",
+};
+
+export const JOB_TYPE_LABELS: Record<JobType, string> = {
+  "full-time": "Full-time",
+  "part-time": "Part-time",
+  internship: "Internship",
+};
+
+export const LOCATION_TYPE_LABELS: Record<JobLocationType, string> = {
+  remote: "Remote",
+  "on-site": "On-site",
+  hybrid: "Hybrid",
+};
