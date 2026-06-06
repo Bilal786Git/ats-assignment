@@ -20,9 +20,11 @@ export class ApplicationsService {
         name: dto.name,
         email: dto.email,
         phone: dto.phone,
-        resume: dto.resume,
+        resume: dto.resume ?? '',
         coverLetter: dto.coverLetter,
-        jobId: dto.jobId,
+        job: {
+          connect: { id: dto.jobId },
+        },
       },
     });
   }

@@ -7,19 +7,60 @@ import { useApi } from "@ats/hooks/useApi";
 import type { Job } from "@ats/types";
 
 const IconBriefcase = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+  >
+    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+    <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" />
+  </svg>
 );
 
 const IconCheckCircle = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+  >
+    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+    <polyline points="22 4 12 14.01 9 11.01" />
+  </svg>
 );
 
 const IconClock = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+  >
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </svg>
 );
 
 const IconXCircle = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+  >
+    <circle cx="12" cy="12" r="10" />
+    <line x1="15" y1="9" x2="9" y2="15" />
+    <line x1="9" y1="9" x2="15" y2="15" />
+  </svg>
 );
 
 const statCards = [
@@ -67,9 +108,11 @@ export default function DashboardPage() {
       .then((data) => {
         setStats({
           total: data.length,
-          live: data.filter((j) => j.status === "live").length,
-          pending: data.filter((j) => j.status === "pending").length,
-          closed: data.filter((j) => j.status === "closed").length,
+          live: data.filter((j) => j.status.toUpperCase() === "LIVE").length,
+          pending: data.filter((j) => j.status.toUpperCase() === "PENDING")
+            .length,
+          closed: data.filter((j) => j.status.toUpperCase() === "CLOSED")
+            .length,
         });
       })
       .catch(() => {});

@@ -6,7 +6,7 @@ import { CreateApplicationDto } from './dto/create-application.dto';
 export class ApplicationsController {
   constructor(private applicationsService: ApplicationsService) {}
 
-  @Post()
+  @Post('create')
   create(@Body() dto: CreateApplicationDto) {
     return this.applicationsService.create(dto);
   }

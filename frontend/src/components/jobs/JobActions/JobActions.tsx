@@ -3,7 +3,6 @@
 import type { Job, JobStatus } from "@ats/types";
 import { JOB_STATUS_FLOW, JOB_STATUS_LABELS } from "@ats/types";
 import apiClient from "@ats/lib/apiClient";
-import { toast } from "@ats/components/ui/Toast/Toast";
 
 interface JobActionsProps {
   job: Job;
@@ -23,10 +22,10 @@ export function JobActions({
   const handleStatusChange = async (newStatus: JobStatus) => {
     try {
       await apiClient.patch(`/jobs/${job.id}`, { status: newStatus });
-      toast("success", `Job moved to ${JOB_STATUS_LABELS[newStatus]}`);
+      alert(`Job moved to ${JOB_STATUS_LABELS[newStatus]}`);
       onStatusChange();
     } catch {
-      toast("error", "Failed to change status");
+      alert("Failed to change status");
     }
   };
 

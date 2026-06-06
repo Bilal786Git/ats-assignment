@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ToastContainer } from "@ats/components/ui/Toast/Toast";
 
 export const metadata: Metadata = {
   title: "ATS - Applicant Tracking System",
@@ -14,10 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        {children}
-        <ToastContainer />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

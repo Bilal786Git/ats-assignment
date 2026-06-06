@@ -11,7 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
-import { CreateJobDto, UpdateJobDto } from './dto/jobs.dto';
+import { CreateJobDto, FindAllJobsDto, UpdateJobDto } from './dto/jobs.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import type { RequestWithUser } from '../common/middleware/context.middleware';
 
@@ -26,8 +26,12 @@ export class JobsController {
   }
 
   @Get()
-  findAll(@Query() query: { status?: string }, @Req() req: RequestWithUser) {
-    return this.jobsService.findAll(req.user?.userId, query.status);
+  findAll(@Query() query: FindAllJobsDto, @Req() req: RequestWithUser) {
+    return this.jobsService.findAll({
+      userId: req.user?.userId,
+      status: query.status,
+      type: query.type,
+    });
   }
 
   @Get(':id')
@@ -43,7 +47,6 @@ export class JobsController {
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateJobDto) {
-    console.log('dto:', dto);
     return this.jobsService.update(id, dto);
   }
 

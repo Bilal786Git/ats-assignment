@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateJobDto, UpdateJobDto } from './dto/jobs.dto';
+import type {
+  CreateJobDto,
+  UpdateJobDto,
+  FindAllJobsDto,
+} from './dto/jobs.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { randomUUID } from 'crypto';
 
@@ -22,7 +26,7 @@ export class JobsService {
     }
   }
 
-  async findAll(userId?: string, status?: string) {
+  async findAll({ userId, status, type, search }: FindAllJobsDto) {
     const statusFilter = status ? status.toUpperCase() : undefined;
     const where: Record<string, unknown> = {};
 
@@ -30,6 +34,16 @@ export class JobsService {
       where.status = statusFilter;
     } else if (!userId) {
       where.status = 'LIVE';
+    }
+
+    if (type) {
+      where.jobType = type.toUpperCase();
+    }
+    if (search) {
+      where.title = {
+        contains: search,
+        mode: 'insensitive',
+      };
     }
 
     return this.prisma.job.findMany({

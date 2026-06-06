@@ -3,47 +3,19 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
 import { Button } from "@ats/components/ui/Button/Button";
 import { Input } from "@ats/components/ui/Input/Input";
 import { Select } from "@ats/components/ui/Select/Select";
 import { TextArea } from "@ats/components/ui/TextArea/TextArea";
 import { FormFieldToggle } from "@ats/components/forms/FormFieldToggle/FormFieldToggle";
-import { DynamicFieldsBuilder } from "@ats/components/forms/DynamicFieldsBuilder/DynamicFieldsBuilder";
 import { useApi } from "@ats/hooks/useApi";
-import { toast } from "@ats/components/ui/Toast/Toast";
-import type { Job, JobFormConfig } from "@ats/types";
+import type { Job } from "@ats/types";
+import { jobSchema } from "@ats/yup/jobSchema";
 import styles from "./JobForm.module.less";
-
-const jobSchema = Yup.object({
-  title: Yup.string().min(2, "Title too short").required("Required"),
-  description: Yup.string()
-    .min(10, "Description too short")
-    .required("Required"),
-  payStartRange: Yup.number().min(0, "Must be positive").required("Required"),
-  payEndRange: Yup.number().min(0, "Must be positive").required("Required"),
-  location: Yup.string().min(2, "Location too short").required("Required"),
-  jobType: Yup.string()
-    .oneOf(["full-time", "part-time", "internship"])
-    .required("Required"),
-  locationType: Yup.string()
-    .oneOf(["remote", "on-site", "hybrid"])
-    .required("Required"),
-  status: Yup.string()
-    .oneOf(["draft", "pending", "live", "closed"])
-    .required("Required"),
-});
+import { JobStatus, JobTypes, LocationType } from "@ats/constants/jobs-meta";
 
 interface JobFormProps {
   initialData?: Job;
-}
-
-function createDefaultConfig(): JobFormConfig {
-  return {
-    coverLetterEnabled: false,
-    resumeRequired: true,
-    customFields: [],
-  };
 }
 
 export function JobForm({ initialData }: JobFormProps) {
@@ -60,6 +32,8 @@ export function JobForm({ initialData }: JobFormProps) {
         jobType: initialData.jobType,
         locationType: initialData.locationType,
         status: initialData.status,
+        resumeRequired: initialData.resumeRequired,
+        coverRequired: initialData.coverRequired,
       }
     : {
         title: "",
@@ -67,32 +41,29 @@ export function JobForm({ initialData }: JobFormProps) {
         payStartRange: 0,
         payEndRange: 0,
         location: "",
-        jobType: "full-time" as const,
-        locationType: "remote" as const,
-        status: "draft" as const,
+        jobType: JobTypes.full_time,
+        locationType: LocationType.remote,
+        status: JobStatus.draft,
+        resumeRequired: false,
+        coverRequired: false,
       };
-
-  const [formConfig, setFormConfig] = React.useState<JobFormConfig>(
-    initialData?.formConfig || createDefaultConfig(),
-  );
 
   const handleSubmit = async (values: typeof initialValues) => {
     if (values.payEndRange < values.payStartRange) {
-      toast("error", "End pay must be >= start pay");
+      alert("End pay must be >= start pay");
       return;
     }
     try {
-      const payload = { ...values, formConfig };
       if (initialData) {
-        await request("PATCH", `/jobs/${initialData.id}`, payload);
-        toast("success", "Job updated successfully");
+        await request("PATCH", `/jobs/${initialData.id}`, values);
+        alert("Job updated successfully");
       } else {
-        await request("POST", "/jobs", payload);
-        toast("success", "Job created successfully");
+        await request("POST", "/jobs", values);
+        alert("Job created successfully");
       }
       router.push("/admin/jobs");
     } catch {
-      toast("error", `Failed to ${initialData ? "update" : "create"} job`);
+      alert(`Failed to ${initialData ? "update" : "create"} job`);
     }
   };
 
@@ -102,7 +73,7 @@ export function JobForm({ initialData }: JobFormProps) {
       validationSchema={jobSchema}
       onSubmit={handleSubmit}
     >
-      {({ errors, touched }) => (
+      {({ errors, touched, values, setFieldValue }) => (
         <Form className={styles.form}>
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>Job Details</h3>
@@ -122,9 +93,10 @@ export function JobForm({ initialData }: JobFormProps) {
                   name="jobType"
                   label="Job Type"
                   options={[
-                    { value: "full-time", label: "Full-time" },
-                    { value: "part-time", label: "Part-time" },
-                    { value: "internship", label: "Internship" },
+                    { value: JobTypes.full_time, label: "Full-time" },
+                    { value: JobTypes.part_time, label: "Part-time" },
+                    { value: JobTypes.internship, label: "Internship" },
+                    { value: JobTypes.contract, label: "Contract" },
                   ]}
                   error={
                     touched.jobType && errors.jobType ? errors.jobType : ""
@@ -176,9 +148,9 @@ export function JobForm({ initialData }: JobFormProps) {
                   name="locationType"
                   label="Location Type"
                   options={[
-                    { value: "remote", label: "Remote" },
-                    { value: "on-site", label: "On-site" },
-                    { value: "hybrid", label: "Hybrid" },
+                    { value: LocationType.remote, label: "Remote" },
+                    { value: LocationType.onsite, label: "On-site" },
+                    { value: LocationType.hybrid, label: "Hybrid" },
                   ]}
                   error={
                     touched.locationType && errors.locationType
@@ -193,10 +165,10 @@ export function JobForm({ initialData }: JobFormProps) {
                   name="status"
                   label="Status"
                   options={[
-                    { value: "draft", label: "Draft" },
-                    { value: "pending", label: "Pending" },
-                    { value: "live", label: "Live" },
-                    { value: "closed", label: "Closed" },
+                    { value: JobStatus.draft, label: "Draft" },
+                    { value: JobStatus.pending, label: "Pending" },
+                    { value: JobStatus.live, label: "Live" },
+                    { value: JobStatus.closed, label: "Closed" },
                   ]}
                   error={touched.status && errors.status ? errors.status : ""}
                 />
@@ -222,33 +194,15 @@ export function JobForm({ initialData }: JobFormProps) {
             <FormFieldToggle
               label="Cover Letter"
               description="Require applicants to submit a cover letter"
-              checked={formConfig.coverLetterEnabled}
-              onChange={(v) =>
-                setFormConfig({ ...formConfig, coverLetterEnabled: v })
-              }
+              checked={values.coverRequired ?? false}
+              onChange={(value) => setFieldValue("coverRequired", value)}
             />
             <FormFieldToggle
               label="Resume / CV"
               description="Require applicants to upload their resume"
-              checked={formConfig.resumeRequired}
-              onChange={(v) =>
-                setFormConfig({ ...formConfig, resumeRequired: v })
-              }
+              checked={values.resumeRequired ?? false}
+              onChange={(value) => setFieldValue("resumeRequired", value)}
             />
-            <div
-              style={{
-                borderTop: "1px solid #e5e7eb",
-                marginTop: 16,
-                paddingTop: 16,
-              }}
-            >
-              <DynamicFieldsBuilder
-                fields={formConfig.customFields}
-                onChange={(fields) =>
-                  setFormConfig({ ...formConfig, customFields: fields })
-                }
-              />
-            </div>
           </div>
 
           <div className={styles.actions}>
