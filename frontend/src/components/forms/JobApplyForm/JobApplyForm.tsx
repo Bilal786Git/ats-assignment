@@ -54,7 +54,7 @@ export function JobApplyForm({ job, onSuccess, onCancel }: JobApplyFormProps) {
       })}
       onSubmit={handleSubmit}
     >
-      {({ errors, touched, setFieldValue }) => {
+      {({ errors, touched, setFieldValue, handleSubmit }) => {
         return (
           <Form className={styles.form}>
             <h3 style={{ fontSize: 16, fontWeight: 600, color: "#111827" }}>
@@ -102,10 +102,14 @@ export function JobApplyForm({ job, onSuccess, onCancel }: JobApplyFormProps) {
             )}
 
             <div className={styles.actions}>
-              <Button type="submit" loading={loading}>
+              <Button
+                type="primary"
+                loading={loading}
+                onClick={() => handleSubmit()}
+              >
                 Submit Application
               </Button>
-              <Button type="button" variant="outline" onClick={onCancel}>
+              <Button type="default" onClick={onCancel}>
                 Cancel
               </Button>
             </div>

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { forwardRef } from 'react';
-import styles from './TextArea.module.less';
+import { forwardRef } from "react";
+import styles from "./TextArea.module.less";
 
 interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -9,8 +9,8 @@ interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 }
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  ({ label, error, className = '', id, ...props }, ref) => {
-    const textareaId = id || label?.toLowerCase().replace(/\s+/g, '-');
+  ({ label, error, className = "", id, ...props }, ref) => {
+    const textareaId = id || label?.toLowerCase().replace(/\s+/g, "-");
     return (
       <div className={styles.wrapper}>
         {label && (
@@ -21,13 +21,13 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
         <textarea
           id={textareaId}
           ref={ref}
-          className={`${styles.textarea} ${error ? styles.hasError : ''} ${className}`}
+          className={`${styles.textarea} ${error ? styles.hasError : ""} ${className}`}
           {...props}
         />
         {error && <span className={styles.errorText}>{error}</span>}
       </div>
     );
-  }
+  },
 );
 
-TextArea.displayName = 'TextArea';
+TextArea.displayName = "TextArea";

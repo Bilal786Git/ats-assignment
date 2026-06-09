@@ -11,14 +11,11 @@ interface ToggleProps {
 
 export function Toggle({ label, description, checked, onChange }: ToggleProps) {
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} onClick={() => onChange(!checked)}>
       <div className={`${styles.track} ${checked ? styles.active : ""}`}>
-        <input
-          type="checkbox"
-          className={styles.thumb}
-          checked={checked}
-          onChange={() => onChange(!checked)}
-        />
+        <div className={styles.thumb} />
+      </div>
+      <div className={styles.labelGroup}>
         <span className={styles.label}>{label}</span>
         {description && (
           <span className={styles.description}>{description}</span>

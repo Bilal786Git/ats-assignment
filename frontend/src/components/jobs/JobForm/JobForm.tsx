@@ -73,7 +73,7 @@ export function JobForm({ initialData }: JobFormProps) {
       validationSchema={jobSchema}
       onSubmit={handleSubmit}
     >
-      {({ errors, touched, values, setFieldValue }) => (
+      {({ errors, touched, values, setFieldValue, handleSubmit }) => (
         <Form className={styles.form}>
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>Job Details</h3>
@@ -92,6 +92,7 @@ export function JobForm({ initialData }: JobFormProps) {
                   as={Select}
                   name="jobType"
                   label="Job Type"
+                  onChange={(value: string) => setFieldValue("jobType", value)}
                   options={[
                     { value: JobTypes.full_time, label: "Full-time" },
                     { value: JobTypes.part_time, label: "Part-time" },
@@ -152,6 +153,9 @@ export function JobForm({ initialData }: JobFormProps) {
                     { value: LocationType.onsite, label: "On-site" },
                     { value: LocationType.hybrid, label: "Hybrid" },
                   ]}
+                  onChange={(value: string) =>
+                    setFieldValue("locationType", value)
+                  }
                   error={
                     touched.locationType && errors.locationType
                       ? errors.locationType
@@ -164,6 +168,7 @@ export function JobForm({ initialData }: JobFormProps) {
                   as={Select}
                   name="status"
                   label="Status"
+                  onChange={(value: string) => setFieldValue("status", value)}
                   options={[
                     { value: JobStatus.draft, label: "Draft" },
                     { value: JobStatus.pending, label: "Pending" },
@@ -206,14 +211,14 @@ export function JobForm({ initialData }: JobFormProps) {
           </div>
 
           <div className={styles.actions}>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.push("/admin/jobs")}
-            >
+            <Button type="default" onClick={() => router.push("/admin/jobs")}>
               Cancel
             </Button>
-            <Button type="submit" loading={loading}>
+            <Button
+              type="primary"
+              onClick={() => handleSubmit()}
+              loading={loading}
+            >
               {initialData ? "Update Job" : "Create Job"}
             </Button>
           </div>

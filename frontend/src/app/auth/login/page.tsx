@@ -174,7 +174,13 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <Button type="submit" loading={loading} fullWidth size="lg">
+          <Button
+            type="primary"
+            onClick={handleSubmit}
+            loading={loading}
+            fullWidth
+            size="large"
+          >
             Sign In
           </Button>
         </form>

@@ -1,42 +1,39 @@
-'use client';
+"use client";
 
-import { forwardRef } from 'react';
-import styles from './Select.module.less';
+import { Select as AntSelect, SelectProps as AntSelectProps } from "antd";
+import styles from "./Select.module.less";
+import classNames from "classnames";
 
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+interface SelectProps extends AntSelectProps {
   label?: string;
   error?: string;
-  options: { value: string; label: string }[];
-  placeholder?: string;
 }
 
-export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, options, placeholder, className = '', id, ...props }, ref) => {
-    const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
-    return (
-      <div className={styles.wrapper}>
-        {label && (
-          <label htmlFor={selectId} className={styles.label}>
-            {label}
-          </label>
-        )}
-        <select
-          id={selectId}
-          ref={ref}
-          className={`${styles.select} ${error ? styles.hasError : ''} ${className}`}
-          {...props}
-        >
-          {placeholder && <option value="">{placeholder}</option>}
-          {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-        {error && <span className={styles.errorText}>{error}</span>}
-      </div>
-    );
-  }
-);
+export const Select = ({
+  label,
+  error,
+  className = "",
+  id,
+  ...props
+}: SelectProps): React.ReactElement => {
+  const selectId = id || label?.toLowerCase().replace(/\s+/g, "-");
+  return (
+    <div className={styles.wrapper}>
+      {label && (
+        <label htmlFor={selectId} className={styles.label}>
+          {label}
+        </label>
+      )}
+      <AntSelect
+        id={selectId}
+        className={classNames(className, styles.select, {
+          [styles.hasError]: error,
+        })}
+        {...props}
+      />
+      {error && <span className={styles.errorText}>{error}</span>}
+    </div>
+  );
+};
 
-Select.displayName = 'Select';
+Select.displayName = "Select";

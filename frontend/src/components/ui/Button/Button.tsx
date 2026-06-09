@@ -1,46 +1,30 @@
-'use client';
+"use client";
+import { Button as AntButton, ButtonProps as AntButtonProps } from "antd";
+import styles from "./Button.module.less";
+import classNames from "classnames";
 
-import styles from './Button.module.less';
-
-type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-type Size = 'sm' | 'md' | 'lg';
-
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: Variant;
-  size?: Size;
-  loading?: boolean;
+interface ButtonProps extends AntButtonProps {
   fullWidth?: boolean;
 }
 
-export function Button({
+export const Button = ({
   children,
-  variant = 'primary',
-  size = 'md',
-  loading,
   fullWidth,
   disabled,
-  className = '',
+  className = "",
+  loading = false,
   ...props
-}: ButtonProps) {
-  const classes = [
-    styles.button,
-    styles[variant],
-    styles[size],
-    fullWidth ? styles.fullWidth : '',
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
-
+}: ButtonProps): React.ReactElement => {
   return (
-    <button className={classes} disabled={disabled || loading} {...props}>
-      {loading && (
-        <svg className={styles.spinner} width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.3" />
-          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-        </svg>
-      )}
+    <AntButton
+      className={classNames(className, styles.button, {
+        [styles.fullWidth]: fullWidth,
+      })}
+      disabled={!!(disabled || loading)}
+      loading={loading}
+      {...props}
+    >
       {children}
-    </button>
+    </AntButton>
   );
-}
+};
