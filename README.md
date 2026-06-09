@@ -19,7 +19,7 @@ npm run start:dev
 cd frontend
 cp env .env
 npm install
-npm run dev
+npm run start:dev
 ```
 
 Open http://localhost:3000/jobs to browse jobs.  
@@ -111,7 +111,7 @@ Next.js 16 with React 19, Formik for forms, Zustand for auth state, LESS modules
 
 | Variable | Default | Notes |
 |----------|---------|-------|
-| `NEXT_PUBLIC_API_URL` | `http://localhost:3000` | Where the backend lives |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:3000` | Where the frontend lives |
 
 ---
 
