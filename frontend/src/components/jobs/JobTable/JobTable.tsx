@@ -27,6 +27,8 @@ export function JobTable({
 }: JobTableProps) {
   const router = useRouter();
 
+  console.log("JOBS:", jobs);
+
   const columns: Column[] = [
     { key: "title", header: "Job Title" },
     {

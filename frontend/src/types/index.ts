@@ -70,21 +70,21 @@ export const JOB_STATUS_FLOW: Record<JobStatus, JobStatus[]> = {
   closed: [],
 };
 
-export const JOB_STATUS_LABELS: Record<JobStatus, string> = {
-  draft: "Draft",
-  pending: "Pending",
-  live: "Live",
-  closed: "Closed",
+export const JOB_STATUS_LABELS: Record<string, string> = {
+  DRAFT: "Draft",
+  PENDING: "Pending",
+  LIVE: "Live",
+  CLOSED: "Closed",
 };
 
-export const JOB_TYPE_LABELS: Record<JobType, string> = {
-  "full-time": "Full-time",
-  "part-time": "Part-time",
-  internship: "Internship",
+export const JOB_TYPE_LABELS: Record<string, string> = {
+  FULL_TIME: "Full-time",
+  PART_TIME: "Part-time",
+  INTERNSHIP: "Internship",
 };
 
-export const LOCATION_TYPE_LABELS: Record<JobLocationType, string> = {
-  remote: "Remote",
-  "on-site": "On-site",
-  hybrid: "Hybrid",
+export const LOCATION_TYPE_LABELS: Record<string, string> = {
+  REMOTE: "Remote",
+  ON_SITE: "On-site",
+  HYBRID: "Hybrid",
 };

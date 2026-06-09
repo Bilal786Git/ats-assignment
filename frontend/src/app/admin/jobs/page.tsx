@@ -9,6 +9,7 @@ import { Modal } from "@ats/components/ui/Modal/Modal";
 import { JobTable } from "@ats/components/jobs/JobTable/JobTable";
 import { useApi } from "@ats/hooks/useApi";
 import type { Job } from "@ats/types";
+import { useDebounceValue } from "@ats/hooks/useDebounce";
 
 export default function AdminJobsPage() {
   const router = useRouter();
@@ -17,15 +18,16 @@ export default function AdminJobsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Job | null>(null);
+  const debouncedSearch = useDebounceValue(search, 500);
 
   React.useEffect(() => {
     const params = new URLSearchParams();
-    if (search) params.set("search", search);
+    if (debouncedSearch) params.set("search", debouncedSearch);
     if (statusFilter) params.set("status", statusFilter);
     request("GET", `/jobs?${params.toString()}`)
       .then(setJobs)
       .catch(() => {});
-  }, [search, statusFilter, request]);
+  }, [debouncedSearch, statusFilter, request]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -33,7 +35,7 @@ export default function AdminJobsPage() {
       await request("DELETE", `/jobs/${deleteTarget.id}`);
       setDeleteTarget(null);
       const params = new URLSearchParams();
-      if (search) params.set("search", search);
+      if (debouncedSearch) params.set("search", debouncedSearch);
       if (statusFilter) params.set("status", statusFilter);
       request("GET", `/jobs?${params.toString()}`)
         .then(setJobs)
@@ -45,7 +47,7 @@ export default function AdminJobsPage() {
 
   const handleRefresh = () => {
     const params = new URLSearchParams();
-    if (search) params.set("search", search);
+    if (debouncedSearch) params.set("search", debouncedSearch);
     if (statusFilter) params.set("status", statusFilter);
     request("GET", `/jobs?${params.toString()}`)
       .then(setJobs)
@@ -70,7 +72,10 @@ export default function AdminJobsPage() {
             Manage your job postings
           </p>
         </div>
-        <Button onClick={() => router.push("/admin/jobs/create")}>
+        <Button
+          type="primary"
+          onClick={() => router.push("/admin/jobs/create")}
+        >
           <svg
             width="16"
             height="16"
@@ -106,10 +111,10 @@ export default function AdminJobsPage() {
             { value: "closed", label: "Closed" },
           ]}
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={(value) => setStatusFilter(value)}
           style={{ width: 160 }}
         />
-        <Button variant="secondary" onClick={handleRefresh}>
+        <Button size="large" onClick={handleRefresh}>
           <svg
             width="16"
             height="16"
@@ -142,10 +147,10 @@ export default function AdminJobsPage() {
           ? This action cannot be undone.
         </p>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
-          <Button variant="outline" onClick={() => setDeleteTarget(null)}>
+          <Button type="default" onClick={() => setDeleteTarget(null)}>
             Cancel
           </Button>
-          <Button variant="danger" onClick={handleDelete}>
+          <Button type="primary" danger onClick={handleDelete}>
             Delete
           </Button>
         </div>

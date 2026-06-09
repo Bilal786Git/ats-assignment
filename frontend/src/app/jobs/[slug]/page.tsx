@@ -264,7 +264,11 @@ export default function PublicJobDetailPage() {
             }}
           >
             {!applying ? (
-              <Button size="lg" onClick={() => setApplying(true)}>
+              <Button
+                size="large"
+                type="primary"
+                onClick={() => setApplying(true)}
+              >
                 Apply for this Job
               </Button>
             ) : (

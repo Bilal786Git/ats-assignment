@@ -5,29 +5,33 @@ import { PublicHeader } from "@ats/components/layout/PublicHeader/PublicHeader";
 import { JobCard } from "@ats/components/jobs/JobCard/JobCard";
 import { Select } from "@ats/components/ui/Select/Select";
 import { CardSkeleton } from "@ats/components/ui/Skeleton/CardSkeleton";
+import { JobTypes } from "@ats/constants/jobs-meta";
+import { Input } from "@ats/components/ui/Input/Input";
+import { useDebounceValue } from "@ats/hooks/useDebounce";
 import { useApi } from "@ats/hooks/useApi";
 import type { Job } from "@ats/types";
-import { JobTypes } from "@ats/constants/jobs-meta";
+import styles from "./page.module.less";
 
 export default function PublicJobsPage() {
   const { request, loading } = useApi<Job[]>();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const debouncedSearch = useDebounceValue(search, 500);
 
   useEffect(() => {
     request(
       "GET",
-      `/jobs?status=live&${search ? `search=${search}` : ""}&${typeFilter ? `type=${typeFilter}` : ""}`,
+      `/jobs?status=live&${debouncedSearch ? `search=${debouncedSearch}` : ""}&${typeFilter ? `type=${typeFilter}` : ""}`,
     )
       .then(setJobs)
       .catch((error) => {
         console.log("ERROR", error);
       });
-  }, [request, search, typeFilter]);
+  }, [request, debouncedSearch, typeFilter]);
 
   const filtered = jobs.filter((job) => {
-    const q = search.toLowerCase();
+    const q = debouncedSearch.toLowerCase();
     const matchesSearch =
       !q ||
       job.title.toLowerCase().includes(q) ||
@@ -38,16 +42,10 @@ export default function PublicJobsPage() {
   });
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
+    <div className={styles.jobsPage}>
       <PublicHeader />
 
-      <div
-        style={{
-          background: "linear-gradient(135deg, #2563eb 0%, #4338ca 100%)",
-          color: "white",
-          padding: "64px 24px",
-        }}
-      >
+      <div className={styles.titleSection}>
         <div style={{ maxWidth: 1280, margin: "0 auto" }}>
           <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 12 }}>
             Find Your Next Role
@@ -79,28 +77,30 @@ export default function PublicJobsPage() {
           }}
         >
           <div style={{ flex: 1, position: "relative", minWidth: 200 }}>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              style={{
-                position: "absolute",
-                left: 12,
-                top: 12,
-                color: "#9ca3af",
-              }}
-            >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input
+            <Input
+              prefix={
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  style={{
+                    position: "absolute",
+                    left: 12,
+                    top: 12,
+                    color: "#9ca3af",
+                  }}
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              }
               type="text"
               placeholder="Search jobs, location, keywords..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(event) => setSearch(event.target.value)}
               style={{
                 width: "100%",
                 height: 40,
@@ -121,8 +121,9 @@ export default function PublicJobsPage() {
               { value: JobTypes.part_time, label: "Part-time" },
               { value: JobTypes.internship, label: "Internship" },
             ]}
+            size="large"
             value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
+            onChange={(value) => setTypeFilter(value)}
             style={{ width: 160 }}
           />
         </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Skeleton } from "@ats/components/ui/Skeleton/Skeleton";
 import { Button } from "@ats/components/ui/Button/Button";
 import { useApi } from "@ats/hooks/useApi";
+import Link from "next/link";
 import type { Job } from "@ats/types";
 
 const IconBriefcase = () => (
@@ -197,9 +198,9 @@ export default function DashboardPage() {
         <p style={{ fontSize: 14, color: "#6b7280", marginBottom: 16 }}>
           Manage your job postings from the Jobs section.
         </p>
-        <a href="/admin/jobs/create">
-          <Button>Create New Job</Button>
-        </a>
+        <Link href="/admin/jobs/create">
+          <Button type="primary">Create New Job</Button>
+        </Link>
       </div>
     </div>
   );
